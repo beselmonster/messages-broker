@@ -39,7 +39,6 @@ export class Handler {
         this.clientManager = clientManager;
         this.eventManager = eventManager;
     }
-
     /**
      * Handles SSE connections
      *
@@ -56,7 +55,7 @@ export class Handler {
         // Create clientId so we can use it to find their response reference and disconnect
         const clientId = Math.floor(new Date().getTime() / 1000);
 
-        Redis.get(token , (err, reply) => {
+        Redis.get(process.env.REDIS_USER_ID_PREFIX + token , (err, reply) => {
             if (err !== null) {
                 logger.error(`Failed to receive token ${token}`);
 

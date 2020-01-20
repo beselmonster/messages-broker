@@ -4,8 +4,14 @@ import {logger} from "../index";
 
 export class RedisProvider {
 
+    /**
+     * Return pub/sub client instance. Use it to publish/subscribe data to redis
+     */
     private pubSubClient:RedisClient;
 
+    /**
+     * Read/Write client instance. Use it to set/read data with redis
+     */
     private writeReadClient:RedisClient;
 
     private handler: Handler;
@@ -61,8 +67,7 @@ export class RedisProvider {
         this.writeReadClient = redis.createClient({
             host: process.env.REDIS_HOST,
             port: Number(process.env.REDIS_PORT),
-            password: process.env.REDIS_PASSWORD,
-            db: process.env.REDIS_DB_WITH_TOKENS_INDEX
+            password: process.env.REDIS_PASSWORD
         });
     }
 
