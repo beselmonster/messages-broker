@@ -27,14 +27,14 @@ export class ClientManager {
     public sendEventByReceiverId(newEvent: Event, receiverId: number) {
         const clients = this.clients.filter((client) => client.receiverId === receiverId);
 
-        let numberOfClients = clients.length;
+        const numberOfClients = clients.length;
 
-        for (let i = 0;i<numberOfClients;i++) {
+        for (let i = 0; i < numberOfClients; i++) {
             clients[i].responseReference.write(
                 "id: " + String(newEvent.id) + "\n" +
                 "event: " + newEvent.type + "\n" +
                 "data:" + JSON.stringify(newEvent.data) + "\n\n"
-            )
+            );
         }
     }
 

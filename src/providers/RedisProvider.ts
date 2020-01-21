@@ -7,29 +7,35 @@ export class RedisProvider {
     /**
      * Return pub/sub client instance. Use it to publish/subscribe data to redis
      */
-    private pubSubClient:RedisClient;
+    private pubSubClient: RedisClient;
 
     /**
      * Read/Write client instance. Use it to set/read data with redis
      */
-    private writeReadClient:RedisClient;
+    private writeReadClient: RedisClient;
 
     private handler: Handler;
 
-    constructor(handler:Handler) {
+    constructor(handler: Handler) {
         this.handler = handler;
     }
 
-    public setUp()
-    {
+    public setUp() {
         this.bootPubSubClient();
         this.bootWriteReadClient();
 
         return this;
     }
 
-    private bootPubSubClient()
-    {
+    public getWriteReadClient(): RedisClient {
+        return this.writeReadClient;
+    }
+
+    public getPubSubClient(): RedisClient {
+        return this.pubSubClient;
+    }
+
+    private bootPubSubClient() {
         this.pubSubClient = redis.createClient({
             host: process.env.REDIS_HOST,
             port: Number(process.env.REDIS_PORT),
@@ -55,30 +61,19 @@ export class RedisProvider {
                     this.handler.getClientManager()
                 );
             } catch (e) {
-                logger.error("Error when subscribe to redis", e);
+                logger.error("Error when publish redis event", e, `Event json: ${message}`);
             }
         });
 
         this.pubSubClient.subscribe(process.env.REDIS_CHANNEL_NAME_TO_LISTEN);
     }
 
-    private bootWriteReadClient()
-    {
+    private bootWriteReadClient() {
         this.writeReadClient = redis.createClient({
             host: process.env.REDIS_HOST,
             port: Number(process.env.REDIS_PORT),
             password: process.env.REDIS_PASSWORD
         });
-    }
-
-    public getWriteReadClient() : RedisClient
-    {
-        return this.writeReadClient;
-    }
-
-    public getPubSubClient() : RedisClient
-    {
-        return this.pubSubClient;
     }
 
 }

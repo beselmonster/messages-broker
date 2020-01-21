@@ -11,19 +11,23 @@ export class LogServiceProvider {
         this.logger = winston.createLogger({
             transports: [
                 new winston.transports.File({
-                    filename: `${process.env.APP_LOG_PATH}app.log` ,
+                    filename: `${process.env.APP_LOG_PATH}app.log`,
                     level: "info"
                 }),
                 new winston.transports.File({
-                    filename: `${process.env.APP_LOG_PATH}err.log` ,
+                    filename: `${process.env.APP_LOG_PATH}err.log`,
                     level: "error"
                 }),
-            ]
+            ],
+            format: winston.format.combine(
+                winston.format.timestamp({format: new Date().toString()}),
+                winston.format.json()
+            )
         });
 
         if (process.env.NODE_ENV !== "production") {
             this.logger.add(new winston.transports.Console({
-                format: winston.format.simple()
+                format: winston.format.simple(),
             }));
         }
 

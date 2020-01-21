@@ -18,7 +18,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 
-//Boot log provider
+// Boot log provider
 const logger = new LogServiceProvider().setUp();
 app.use((request, response, next) => {
     logger.info(`${request.method} ${request.url} connection from: ${request.ip}`);
@@ -32,7 +32,7 @@ app.get("/events/listen/", (request: Request, response: Response) => {
     handler.eventHandler(request, response);
 });
 
-//Boot redis provider
+// Boot redis provider
 const redisProvider = new RedisProvider(handler).setUp();
 
 // Listen for incoming connections
@@ -46,5 +46,6 @@ const Redis = redisProvider.getWriteReadClient();
 
 export {
     logger,
-    Redis
+    Redis,
+    app
 };
