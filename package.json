@@ -1,7 +1,7 @@
 {
   "name": "nodejs-messages-broker",
   "version": "1.0.0",
-  "description": "",
+  "description": "Messages Broker",
   "main": "dist/index.js",
   "scripts": {
     "prebuild": "tslint -c tslint.json -p tsconfig.json --fix",
