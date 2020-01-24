@@ -46,6 +46,5 @@ const Redis = redisProvider.getWriteReadClient();
 
 export {
     logger,
-    Redis,
-    app
+    Redis
 };

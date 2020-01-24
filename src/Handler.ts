@@ -46,14 +46,14 @@ export class Handler {
      * @param response Response
      */
     public eventHandler(request: Request, response: Response) {
-        const token: string | undefined = request.query.token;
+        const token= request.query.token;
 
         if (token === undefined) {
             return response.status(403).end();
         }
 
         // Create clientId so we can use it to find their response reference and disconnect
-        const clientId = Math.floor(new Date().getTime() / 1000);
+        const clientId = new Date().getTime();
 
         Redis.get(process.env.REDIS_USER_ID_PREFIX + token , (err, reply) => {
             if (err !== null) {

@@ -53,13 +53,20 @@ export class RedisProvider {
             try {
                 const data = JSON.parse(message)?.data;
 
-                this.handler.getEventManager().publish(
-                    data?.event_id,
-                    data?.attributes,
-                    data?.event_type,
-                    data?.receiver_id,
-                    this.handler.getClientManager()
-                );
+                if (data !== undefined) {
+                    if (
+                        data.hasOwnProperty('attributes') &&
+                        data.hasOwnProperty('event_type') &&
+                        data.hasOwnProperty('receiver_id')
+                    ) {
+                        this.handler.getEventManager().publish(
+                            data?.attributes,
+                            data?.event_type,
+                            data?.receiver_id,
+                            this.handler.getClientManager()
+                        );
+                    }
+                }
             } catch (e) {
                 logger.error("Error when publish redis event", e, `Event json: ${message}`);
             }

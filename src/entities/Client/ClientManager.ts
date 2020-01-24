@@ -16,7 +16,7 @@ export class ClientManager {
     }
 
     public remove(clientId: number) {
-        this.clients = this.clients.filter((c) => c.id !== clientId);
+        this.clients = this.clients.filter((c) => c.getId() !== clientId);
     }
 
     /**
@@ -25,16 +25,15 @@ export class ClientManager {
      * @param receiverId number
      */
     public sendEventByReceiverId(newEvent: Event, receiverId: number) {
-        const clients = this.clients.filter((client) => client.receiverId === receiverId);
-
-        const numberOfClients = clients.length;
+        const numberOfClients = this.clients.length;
 
         for (let i = 0; i < numberOfClients; i++) {
-            clients[i].responseReference.write(
-                "id: " + String(newEvent.id) + "\n" +
-                "event: " + newEvent.type + "\n" +
-                "data:" + JSON.stringify(newEvent.data) + "\n\n"
-            );
+            if (this.clients[i].getReceiverId() === receiverId) {
+                this.clients[i].getResponseReference().write(
+                    "event: " + newEvent.getType() + "\n" +
+                    "data:" + JSON.stringify(newEvent.getData()) + "\n\n"
+                );
+            }
         }
     }
 
