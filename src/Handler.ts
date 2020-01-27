@@ -46,7 +46,7 @@ export class Handler {
      * @param response Response
      */
     public eventHandler(request: Request, response: Response) {
-        const token= request.query.token;
+        const token = request.query.token;
 
         if (token === undefined) {
             return response.status(403).end();

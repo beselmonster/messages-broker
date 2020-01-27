@@ -55,9 +55,9 @@ export class RedisProvider {
 
                 if (data !== undefined) {
                     if (
-                        data.hasOwnProperty('payload') &&
-                        data.hasOwnProperty('root_event_type') &&
-                        data.hasOwnProperty('receiver_id')
+                        data.hasOwnProperty("payload") &&
+                        data.hasOwnProperty("root_event_type") &&
+                        data.hasOwnProperty("receiver_id")
                     ) {
                         this.handler.getEventManager().publish(
                             data.payload,
