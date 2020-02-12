@@ -36,10 +36,13 @@ app.get("/events/listen/", (request: Request, response: Response) => {
 const redisProvider = new RedisProvider(handler).setUp();
 
 // Listen for incoming connections
-app.listen(process.env.SERVER_PORT, () =>
+const server = app.listen(process.env.SERVER_PORT, () =>
     // tslint:disable-next-line:no-console
     console.log(`Events service listening on port ${process.env.SERVER_PORT}`)
 );
+server.on('connection', (socket) => {
+    socket.setTimeout(0);
+});
 
 // Client for read/write
 const Redis = redisProvider.getWriteReadClient();
