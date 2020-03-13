@@ -14,10 +14,13 @@ export class RedisProvider {
      */
     private writeReadClient: RedisClient;
 
+    private connectionParams: string;
+
     private handler: Handler;
 
     constructor(handler: Handler) {
         this.handler = handler;
+        this.connectionParams = "rediss://" + process.env.REDIS_DATABASE + ":" + process.env.REDIS_PASSWORD + "@" + process.env.REDIS_HOST + ":" + process.env.REDIS_PORT;
     }
 
     public setUp() {
@@ -36,11 +39,8 @@ export class RedisProvider {
     }
 
     private bootPubSubClient() {
-        this.pubSubClient = redis.createClient({
-            host: process.env.REDIS_HOST,
-            port: Number(process.env.REDIS_PORT),
-            password: process.env.REDIS_PASSWORD,
-            tls: {port: process.env.REDIS_PORT, host: process.env.REDIS_HOST}
+        this.pubSubClient = redis.createClient(this.connectionParams, {
+            tls: { servername: new URL(this.connectionParams).hostname}
         });
 
         this.pubSubClient.on("error", (err) => {
@@ -77,11 +77,8 @@ export class RedisProvider {
     }
 
     private bootWriteReadClient() {
-        this.writeReadClient = redis.createClient({
-            host: process.env.REDIS_HOST,
-            port: Number(process.env.REDIS_PORT),
-            password: process.env.REDIS_PASSWORD,
-            tls: {port: process.env.REDIS_PORT, host: process.env.REDIS_HOST}
+        this.writeReadClient = redis.createClient(this.connectionParams, {
+            tls: { servername: new URL(this.connectionParams).hostname}
         });
     }
 }
