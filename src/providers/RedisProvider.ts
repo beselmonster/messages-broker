@@ -39,7 +39,8 @@ export class RedisProvider {
         this.pubSubClient = redis.createClient({
             host: process.env.REDIS_HOST,
             port: Number(process.env.REDIS_PORT),
-            password: process.env.REDIS_PASSWORD
+            password: process.env.REDIS_PASSWORD,
+            tls: {port: process.env.REDIS_PORT, host: process.env.REDIS_HOST}
         });
 
         this.pubSubClient.on("error", (err) => {
@@ -79,8 +80,8 @@ export class RedisProvider {
         this.writeReadClient = redis.createClient({
             host: process.env.REDIS_HOST,
             port: Number(process.env.REDIS_PORT),
-            password: process.env.REDIS_PASSWORD
+            password: process.env.REDIS_PASSWORD,
+            tls: {port: process.env.REDIS_PORT, host: process.env.REDIS_HOST}
         });
     }
-
 }
