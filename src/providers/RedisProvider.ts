@@ -1,6 +1,6 @@
 import redis, {RedisClient} from "redis";
 import {Handler} from "../Handler";
-import {logger} from "../index";
+import {logger, Redis} from "../index";
 
 export class RedisProvider {
 
@@ -14,13 +14,17 @@ export class RedisProvider {
      */
     private writeReadClient: RedisClient;
 
-    private connectionParams: string;
+    /**
+     * Connection string for redis
+     */
+    private connectionString: string;
 
     private handler: Handler;
 
     constructor(handler: Handler) {
         this.handler = handler;
-        this.connectionParams = "rediss://" + process.env.REDIS_DATABASE + ":" + process.env.REDIS_PASSWORD + "@" + process.env.REDIS_HOST + ":" + process.env.REDIS_PORT;
+
+        this.setConnectionString();
     }
 
     public setUp() {
@@ -34,23 +38,20 @@ export class RedisProvider {
         return this.writeReadClient;
     }
 
-    public getPubSubClient(): RedisClient {
-        return this.pubSubClient;
-    }
-
     private bootPubSubClient() {
-        this.pubSubClient = redis.createClient(this.connectionParams, {
-            tls: { servername: new URL(this.connectionParams).hostname}
-        });
+        this.pubSubClient = this.createRedisClient();
 
         this.pubSubClient.on("error", (err) => {
             logger.error("Redis error:", err);
         });
 
         this.pubSubClient.on("message", (channel, message) => {
-            logger.info(
-                `Received data from Redis channel ${process.env.REDIS_CHANNEL_NAME_TO_LISTEN}: ${message}`
-            );
+            if (process.env.NODE_ENV === "development") {
+                logger.info(
+                    `Received data from Redis channel ${process.env.REDIS_CHANNEL_NAME_TO_LISTEN}: ${message}`
+                );
+            }
+
             try {
                 const data = JSON.parse(message)?.data;
 
@@ -77,8 +78,43 @@ export class RedisProvider {
     }
 
     private bootWriteReadClient() {
-        this.writeReadClient = redis.createClient(this.connectionParams, {
-            tls: { servername: new URL(this.connectionParams).hostname}
+        this.writeReadClient = this.createRedisClient();
+
+        this.writeReadClient.on("error", (err) => {
+            logger.error("Redis error:", err);
         });
     }
+
+    private createRedisClient(): RedisClient
+    {
+        let options:any = {};
+
+        if (process.env.REDIS_TLS === 'true') {
+            options.tls = {
+                servername: new URL(this.connectionString).hostname
+            }
+        }
+
+        return redis.createClient(this.connectionString, options)
+    }
+
+    /**
+     * Set connection redis string
+     */
+    private setConnectionString(): void
+    {
+        this.connectionString = "redis://";
+
+        if (process.env.REDIS_DATABASE !== "") {
+            this.connectionString += process.env.REDIS_DATABASE;
+        }
+
+        if (process.env.REDIS_PASSWORD !== "") {
+            this.connectionString += `:${process.env.REDIS_PASSWORD}@`;
+        }
+
+        this.connectionString += process.env.REDIS_HOST;
+        this.connectionString += `:${process.env.REDIS_PORT}`;
+    }
+
 }

@@ -74,12 +74,10 @@ export class Handler {
             this.getClientManager().add(new Client(clientId, receiverId, response));
         });
 
-        Redis.on("error", (err) => {
-            logger.error("Redis error:", err);
-        });
-
         request.on("close", () => {
-            logger.info(`ClientId: ${clientId} Connection closed`);
+            if (process.env.NODE_ENV === "development") {
+                logger.info(`ClientId: ${clientId} Connection closed`);
+            }
 
             this.getClientManager().remove(clientId);
         });
