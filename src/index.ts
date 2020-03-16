@@ -20,10 +20,6 @@ app.use(bodyParser.urlencoded({extended: false}));
 
 // Boot log provider
 const logger = new LogServiceProvider().setUp();
-app.use((request, response, next) => {
-    logger.info(`${request.method} ${request.url} connection from: ${request.ip}`);
-    next();
-});
 
 // Main handler that handles HTTP connections
 const handler = new Handler(new ClientManager(), new EventManager());
@@ -38,9 +34,9 @@ const redisProvider = new RedisProvider(handler).setUp();
 // Listen for incoming connections
 const server = app.listen(process.env.SERVER_PORT, () =>
     // tslint:disable-next-line:no-console
-    console.log(`Events service listening on port ${process.env.SERVER_PORT}`)
+    console.log(`Events service listening on port ${process.env.SERVER_PORT} NODE_ENV:${process.env.NODE_ENV}`)
 );
-server.on('connection', (socket) => {
+server.on("connection", (socket) => {
     socket.setTimeout(0);
 });
 
