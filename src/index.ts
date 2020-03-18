@@ -3,8 +3,6 @@ import cors from "cors";
 import dotenv from "dotenv";
 import {Request, Response} from "express";
 import express from "express";
-import fs from "fs";
-import https from "https";
 import {ClientManager} from "./entities/Client/ClientManager";
 import {EventManager} from "./entities/Event/EventManager";
 import {Handler} from "./Handler";
@@ -13,10 +11,6 @@ import {RedisProvider} from "./providers/RedisProvider";
 
 // Loads application env variables
 dotenv.config();
-
-const privateKey = fs.readFileSync(process.env.SSL_CERT_PATH + "/privkey.pem", "utf8");
-const certificate = fs.readFileSync(process.env.SSL_CERT_PATH + "/fullchain.pem", "utf8");
-const credentials = {key: privateKey, cert: certificate};
 
 // Express app init
 const app = express();
@@ -38,13 +32,10 @@ app.get("/events/listen/", (request: Request, response: Response) => {
 const redisProvider = new RedisProvider(handler).setUp();
 
 // Listen for incoming connections
-const server = https.createServer(credentials, app).listen(process.env.SERVER_PORT, () =>
+app.listen(process.env.SERVER_PORT, () =>
     // tslint:disable-next-line:no-console
-    console.log(`Events service listening on port ${process.env.SERVER_PORT} NODE_ENV:${process.env.NODE_ENV}`)
+    console.log(`Events service listening on port ${process.env.SERVER_PORT}`)
 );
-server.on("connection", (socket) => {
-    socket.setTimeout(0);
-});
 
 // Client for read/write
 const Redis = redisProvider.getWriteReadClient();
