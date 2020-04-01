@@ -9,17 +9,23 @@ export class EventManager {
      * @param data {}
      * @param eventType string
      * @param receiverId number
+     * @param sendToAll
      * @param clientManager ClientManager
      */
     public async publish(
         data: {},
         eventType: string,
-        receiverId: number,
+        receiverId: number|null,
+        sendToAll: boolean,
         clientManager: ClientManager
     ) {
         const event = new Event(data, eventType);
 
-        clientManager.sendEventByReceiverId(event, receiverId);
+        if (receiverId && !sendToAll) {
+            clientManager.sendEventByReceiverId(event, receiverId);
+        } else {
+            clientManager.sendEventToAll(event);
+        }
     }
 
 }

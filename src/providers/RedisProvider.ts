@@ -59,12 +59,14 @@ export class RedisProvider {
                     if (
                         data.hasOwnProperty("payload") &&
                         data.hasOwnProperty("root_event_type") &&
-                        data.hasOwnProperty("receiver_id")
+                        data.hasOwnProperty("receiver_id") &&
+                        data.hasOwnProperty("send_to_all")
                     ) {
                         this.handler.getEventManager().publish(
                             data.payload,
                             data.root_event_type,
                             data.receiver_id,
+                            data.send_to_all,
                             this.handler.getClientManager()
                         );
                     }
