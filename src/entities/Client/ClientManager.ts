@@ -29,12 +29,33 @@ export class ClientManager {
 
         for (let i = 0; i < numberOfClients; i++) {
             if (this.clients[i].getReceiverId() === receiverId) {
-                this.clients[i].getResponseReference().write(
-                    "event: " + newEvent.getType() + "\n" +
-                    "data:" + JSON.stringify(newEvent.getData()) + "\n\n"
-                );
+                this.sendEvent(newEvent, this.clients[i]);
             }
         }
+    }
+
+    /**
+     * Send event to all clients
+     * @param newEvent
+     */
+    public sendEventToAll(newEvent: Event) {
+        const numberOfClients = this.clients.length;
+
+        for (let i = 0; i < numberOfClients; i++) {
+            this.sendEvent(newEvent, this.clients[i]);
+        }
+    }
+
+    /**
+     * Send event to specific client
+     * @param newEvent
+     * @param client
+     */
+    public sendEvent(newEvent: Event, client: Client) {
+        client.getResponseReference().write(
+            "event: " + newEvent.getType() + "\n" +
+            "data:" + JSON.stringify(newEvent.getData()) + "\n\n"
+        );
     }
 
 }
