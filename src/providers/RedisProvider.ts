@@ -87,24 +87,22 @@ export class RedisProvider {
         });
     }
 
-    private createRedisClient(): RedisClient
-    {
-        let options:any = {};
+    private createRedisClient(): RedisClient {
+        const options: any = {};
 
-        if (process.env.REDIS_TLS === 'true') {
+        if (process.env.REDIS_TLS === "true") {
             options.tls = {
                 servername: new URL(this.connectionString).hostname
-            }
+            };
         }
 
-        return redis.createClient(this.connectionString, options)
+        return redis.createClient(this.connectionString, options);
     }
 
     /**
      * Set connection redis string
      */
-    private setConnectionString(): void
-    {
+    private setConnectionString(): void {
         this.connectionString = "redis://";
 
         if (process.env.REDIS_DATABASE !== "") {
