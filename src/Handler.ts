@@ -2,7 +2,7 @@ import {Request, Response} from "express";
 import {Client} from "./entities/Client/Client";
 import {ClientManager} from "./entities/Client/ClientManager";
 import {EventManager} from "./entities/Event/EventManager";
-import {Redis} from "./index";
+import {env, Redis} from "./index";
 import {logger} from "./index";
 
 export class Handler {
@@ -48,36 +48,40 @@ export class Handler {
     public eventHandler(request: Request, response: Response) {
         const token = request.query.token;
 
-        if (token === undefined) {
-            return response.status(403).end();
-        }
-
         // Create clientId so we can use it to find their response reference and disconnect
         const clientId = new Date().getTime();
 
-        Redis.get(process.env.REDIS_USER_ID_PREFIX + token , (err, reply) => {
-            if (err !== null) {
-                logger.error(`Failed to receive token ${token}`);
+        const client = new Client(clientId, null, response);
+        this.getClientManager().add(client);
 
-                return response.status(500).end();
-            }
+        response.writeHead(200, Handler.HEADERS);
+        response.write("data: Connection success\n\n");
 
-            if (reply === null) {
-                return response.status(403).end();
-            }
+        if (token !== undefined) {
+            Redis.get(env.REDIS_USER_ID_PREFIX + token , (err, reply) => {
+                if (err !== null) {
+                    logger.error(`Failed to receive token ${token}`, {
+                        error: err,
+                        client: client,
+                        redisResponse: reply
+                    });
 
-            const receiverId: number = Number(reply.split(process.env.REDIS_USER_TOKEN_PREFIX)[1]);
+                    response.write("Internal server error");
 
-            response.writeHead(200, Handler.HEADERS);
-            response.write("data: Connection success\n\n");
+                    return response.status(500).end();
+                }
+                if (reply === null) {
+                   response.write("Token is wrong. You will receive public events\n\n");
+                } else {
+                    const receiverId: number = Number(reply.split(env.REDIS_USER_TOKEN_PREFIX)[1]);
 
-            this.getClientManager().add(new Client(clientId, receiverId, response));
-        });
+                    this.clientManager.authorize(client, receiverId);
+                }
+            });
+        }
 
         request.on("close", () => {
-            if (process.env.NODE_ENV === "development") {
-                logger.info(`ClientId: ${clientId} Connection closed`);
-            }
+            logger.debug(`ClientId: ${clientId} Connection closed`);
 
             this.getClientManager().remove(clientId);
         });

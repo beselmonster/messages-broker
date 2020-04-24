@@ -1,6 +1,6 @@
 import redis, {RedisClient} from "redis";
 import {Handler} from "../Handler";
-import {logger, Redis} from "../index";
+import {env, logger, Redis} from "../index";
 
 export class RedisProvider {
 
@@ -46,13 +46,11 @@ export class RedisProvider {
         });
 
         this.pubSubClient.on("message", (channel, message) => {
-            if (process.env.NODE_ENV === "development") {
-                logger.info(
-                    `Received data from Redis channel ${process.env.REDIS_CHANNEL_NAME_TO_LISTEN}: ${message}`
+                logger.debug(
+                    `Received data from Redis channel ${env.REDIS_CHANNEL_NAME_TO_LISTEN}: ${message}`
                 );
-            }
 
-            try {
+                try {
                 const data = JSON.parse(message)?.data;
 
                 if (data !== undefined) {
@@ -76,7 +74,7 @@ export class RedisProvider {
             }
         });
 
-        this.pubSubClient.subscribe(process.env.REDIS_CHANNEL_NAME_TO_LISTEN);
+        this.pubSubClient.subscribe(env.REDIS_CHANNEL_NAME_TO_LISTEN);
     }
 
     private bootWriteReadClient() {
@@ -90,7 +88,7 @@ export class RedisProvider {
     private createRedisClient(): RedisClient {
         const options: any = {};
 
-        if (process.env.REDIS_TLS === "true") {
+        if (env.REDIS_TLS === "true") {
             options.tls = {
                 servername: new URL(this.connectionString).hostname
             };
@@ -105,16 +103,16 @@ export class RedisProvider {
     private setConnectionString(): void {
         this.connectionString = "redis://";
 
-        if (process.env.REDIS_DATABASE !== "") {
-            this.connectionString += process.env.REDIS_DATABASE;
+        if (env.REDIS_DATABASE !== "") {
+            this.connectionString += env.REDIS_DATABASE;
         }
 
-        if (process.env.REDIS_PASSWORD !== "") {
-            this.connectionString += `:${process.env.REDIS_PASSWORD}@`;
+        if (env.REDIS_PASSWORD !== "") {
+            this.connectionString += `:${env.REDIS_PASSWORD}@`;
         }
 
-        this.connectionString += process.env.REDIS_HOST;
-        this.connectionString += `:${process.env.REDIS_PORT}`;
+        this.connectionString += env.REDIS_HOST;
+        this.connectionString += `:${env.REDIS_PORT}`;
     }
 
 }

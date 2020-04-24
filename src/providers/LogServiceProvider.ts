@@ -1,4 +1,5 @@
 import winston from "winston";
+import {env} from "../index";
 
 export class LogServiceProvider {
 
@@ -11,11 +12,11 @@ export class LogServiceProvider {
         this.logger = winston.createLogger({
             transports: [
                 new winston.transports.File({
-                    filename: `${process.env.APP_LOG_PATH}app.log`,
+                    filename: `${env.APP_LOG_PATH}app.log`,
                     level: "info"
                 }),
                 new winston.transports.File({
-                    filename: `${process.env.APP_LOG_PATH}err.log`,
+                    filename: `${env.APP_LOG_PATH}err.log`,
                     level: "error"
                 }),
             ],
@@ -25,9 +26,10 @@ export class LogServiceProvider {
             )
         });
 
-        if (process.env.NODE_ENV !== "production") {
+        if (env.NODE_ENV !== "production") {
             this.logger.add(new winston.transports.Console({
                 format: winston.format.simple(),
+                level: "debug"
             }));
         }
 
