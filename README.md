@@ -13,7 +13,7 @@
 
 <h4>Testing</h4>
 <ul>
-get token from http://10.70.0.42/user/token/short:8081
+get token from ....
 </ul>
 <ul>
 listen events stream using :<br>curl -H Accept:text/event-stream http://{{your server adress}}/events/listen?token={{token}}
