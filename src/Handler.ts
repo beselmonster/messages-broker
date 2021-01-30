@@ -1,7 +1,7 @@
 import {Request, Response} from "express";
-import {Client} from "./entities/Client/Client";
-import {ClientManager} from "./entities/Client/ClientManager";
-import {EventManager} from "./entities/Event/EventManager";
+import {Client} from "./Entities/Client/Client";
+import {ClientManager} from "./Entities/Client/ClientManager";
+import {EventManager} from "./Entities/Event/EventManager";
 import {env, Redis} from "./index";
 import {logger} from "./index";
 
@@ -62,7 +62,7 @@ export class Handler {
                 if (err !== null) {
                     logger.error(`Failed to receive token ${token}`, {
                         error: err,
-                        client: client,
+                        client,
                         redisResponse: reply
                     });
 

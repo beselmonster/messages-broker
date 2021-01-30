@@ -3,11 +3,12 @@ import cors from "cors";
 import dotenv from "dotenv";
 import {Request, Response} from "express";
 import express from "express";
-import {ClientManager} from "./entities/Client/ClientManager";
-import {EventManager} from "./entities/Event/EventManager";
+import {Socket} from "net";
+import {ClientManager} from "./Entities/Client/ClientManager";
+import {EventManager} from "./Entities/Event/EventManager";
 import {Handler} from "./Handler";
-import {LogServiceProvider} from "./providers/LogServiceProvider";
-import {RedisProvider} from "./providers/RedisProvider";
+import {LogServiceProvider} from "./Providers/LogServiceProvider";
+import {RedisProvider} from "./Providers/RedisProvider";
 
 // Loads application env variables
 dotenv.config();
@@ -38,7 +39,7 @@ const server = app.listen(env.SERVER_PORT, () =>
     // tslint:disable-next-line:no-console
     console.log(`Events service listening on port ${env.SERVER_PORT} NODE_ENV:${env.NODE_ENV}`)
 );
-server.on("connection", (socket) => {
+server.on("connection", (socket: Socket) => {
     socket.setTimeout(Number(env.SERVER_CONNECTION_TIMEOUT_IN_MILLISECONDS));
 });
 
